@@ -23,10 +23,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::get('/reservasi/create', [ReservasiController::class, 'create'])->name('reservasi.create');
-    Route::post('/reservasi/store', [ReservasiController::class, 'store'])->name('reservasi.store');
-    Route::get('/kartu-imunisasi/{nik}', [ReservasiController::class, 'kartuImunisasi'])->name('kartu-imunisasi');
+    //Route::get('/reservasi/create', [ReservasiController::class, 'create'])->name('reservasi.create');
+   // Route::post('/reservasi/store', [ReservasiController::class, 'store'])->name('reservasi.store');
+    //Route::get('/kartu-imunisasi/{nik}', [ReservasiController::class, 'kartuImunisasi'])->name('kartu-imunisasi');
 });
 
- Route::get('/tentang', [TentangController::class, 'show'])->name('show');
 require __DIR__.'/auth.php';

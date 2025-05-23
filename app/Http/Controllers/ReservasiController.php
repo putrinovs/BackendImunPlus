@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Model\Reservasi;
-use App\Model\Vaksin;
+use App\Models\Reservasi;
+use App\Models\Vaksin;
 
 class ReservasiController extends Controller
 {
@@ -21,9 +21,10 @@ class ReservasiController extends Controller
     }
 
     // Menyimpan data reservasi ke database
-    public function store(Request $request)
-    {
-        $request->validate([
+  public function store(Request $request)
+{
+    try {
+        $validated = $request->validate([
             'nama_ibu' => 'required|string|max:255',
             'nik' => 'required|string|max:16|unique:reservasi,nik',
             'tanggal_lahir' => 'required|date',
@@ -36,21 +37,35 @@ class ReservasiController extends Controller
             'vaksin_id' => 'required|exists:vaksin,id',
         ]);
 
-        Reservasi::create($request->all());
+        $reservasi = Reservasi::create($validated);
 
-        return redirect()->route('kartu-imunisasi', ['nik' => $request->nik])
-            ->with('success', 'Reservasi berhasil dibuat!');
+        return response()->json([
+            'success' => true,
+            'message' => 'Reservasi berhasil dibuat!',
+            'data' => $reservasi
+        ], 201); // 201 Created
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validasi gagal.',
+            'errors' => $e->errors()
+        ], 422); // 422 Unprocessable Entity
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Terjadi kesalahan saat membuat reservasi.',
+            'error' => $e->getMessage()
+        ], 500); // 500 Internal Server Error
     }
-
+}
     // Menampilkan kartu imunisasi
-    public function kartuImunisasi($nik)
+    public function kartuImunisasi(Request $request)
     {
+       
+        $nik = $request->query('nik'); // Ambil query parameter ?nik=...
         $reservasi = Reservasi::with('vaksin')->where('nik', $nik)->firstOrFail();
 
-        return Inertia::render('KartuImunisasiPage', [
-            'reservasi' => $reservasi
-            
-        ]);
+        return $reservasi;
 
 
     }
